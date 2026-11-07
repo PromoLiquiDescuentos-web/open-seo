@@ -34,7 +34,7 @@ https://YOUR_WORKER_HOSTNAME/mcp
 
 ## Manage accounts
 
-With password accounts, the first visitor creates the administrator's account and teammates join from invitation links (Team settings). There is no email delivery, so password resets and accounts outside the invitation flow are operator commands:
+With password accounts, the first visitor creates the administrator's account and teammates join from invitation links (Team settings). On a public URL, set `OPENSEO_OPERATOR_BOOTSTRAP=1` together with `OPENSEO_OPERATOR_SECRET` before the first deploy: the public sign-up page then does not offer the administrator account, and `create-user` below is how that account is created. There is no email delivery, so password resets and accounts outside the invitation flow are operator commands:
 
 1. Set `OPENSEO_OPERATOR_SECRET` in `.env.selfhost` to a random value (`openssl rand -hex 32`) and redeploy. This turns on the operator endpoint, which answers only to requests carrying that secret.
 2. Run the command with the password on standard input and the deployed URL in `OPENSEO_URL`. This Bash example keeps the password out of shell history and process arguments:

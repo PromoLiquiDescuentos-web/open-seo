@@ -1,6 +1,7 @@
 import { env } from "cloudflare:workers";
 import { timingSafeEqual } from "node:crypto";
 import { Buffer } from "node:buffer";
+import { isTelemetryOptOutValue } from "@/shared/selfhost-checks";
 
 const MIN_OPERATOR_SECRET_LENGTH = 32;
 
@@ -15,6 +16,14 @@ export function hasOperatorSecret(): boolean {
   return (
     typeof secret === "string" && secret.length >= MIN_OPERATOR_SECRET_LENGTH
   );
+}
+
+// Set on a public self-host so a stranger cannot claim the first account
+// while the operator creates it. Same off-list as telemetry: unset stays
+// off, and "0"/"false"/"no"/"off" leave the public first-account form open.
+export function isOperatorBootstrapRequired(): boolean {
+  const value: unknown = Reflect.get(env, "OPENSEO_OPERATOR_BOOTSTRAP");
+  return typeof value === "string" && isTelemetryOptOutValue(value);
 }
 
 export function isOperatorRequest(headers: Headers | undefined): boolean {

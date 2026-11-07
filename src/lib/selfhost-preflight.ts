@@ -1,5 +1,6 @@
 import { AUTH_MODES } from "@/lib/auth-mode";
 import {
+  isTelemetryOptOutValue,
   looksLikeDataForSeoKey,
   MIN_BETTER_AUTH_SECRET_LENGTH,
   validateTeamDomain,
@@ -61,11 +62,22 @@ function checkAuthMode(env: EnvRecord, items: PreflightItem[]): void {
   if (mode === "password") {
     const url = get(env, "BETTER_AUTH_URL");
     const secret = get(env, "BETTER_AUTH_SECRET");
+    const operatorBootstrap = isTelemetryOptOutValue(
+      get(env, "OPENSEO_OPERATOR_BOOTSTRAP"),
+    );
+    const operatorSecret = get(env, "OPENSEO_OPERATOR_SECRET");
     const missing = [
       url ? null : "BETTER_AUTH_URL",
       secret && secret.length >= MIN_BETTER_AUTH_SECRET_LENGTH
         ? null
         : `BETTER_AUTH_SECRET (at least ${MIN_BETTER_AUTH_SECRET_LENGTH} characters)`,
+      operatorBootstrap &&
+      operatorSecret &&
+      operatorSecret.length >= MIN_BETTER_AUTH_SECRET_LENGTH
+        ? null
+        : operatorBootstrap
+          ? `OPENSEO_OPERATOR_SECRET (at least ${MIN_BETTER_AUTH_SECRET_LENGTH} characters)`
+          : null,
     ].filter(Boolean);
     items.push(
       missing.length
@@ -79,8 +91,9 @@ function checkAuthMode(env: EnvRecord, items: PreflightItem[]): void {
             key: "auth",
             name: "AUTH_MODE",
             level: "ok",
-            message:
-              "password — email and password accounts; the first visitor creates the admin account and invitations add the rest",
+            message: operatorBootstrap
+              ? "password — email and password accounts; the operator creates the administrator, and invitations add the rest"
+              : "password — email and password accounts; the first visitor creates the admin account and invitations add the rest",
           },
     );
     return;

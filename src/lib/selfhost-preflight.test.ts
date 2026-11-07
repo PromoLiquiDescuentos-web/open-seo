@@ -48,6 +48,36 @@ describe("runSelfhostPreflight", () => {
     expect(message).not.toContain("BETTER_AUTH_SECRET,");
   });
 
+  it("requires the operator secret when public bootstrap is closed", () => {
+    const result = runSelfhostPreflight({
+      AUTH_MODE: "password",
+      BETTER_AUTH_URL: "https://open-seo.example.workers.dev",
+      BETTER_AUTH_SECRET: "x".repeat(40),
+      OPENSEO_OPERATOR_BOOTSTRAP: "1",
+    });
+
+    expect(result.failed).toBe(true);
+    expect(itemFor(result, "AUTH_MODE")?.message).toContain(
+      "OPENSEO_OPERATOR_SECRET",
+    );
+  });
+
+  it("tells the operator to create the administrator when bootstrap is closed", () => {
+    const result = runSelfhostPreflight({
+      AUTH_MODE: "password",
+      BETTER_AUTH_URL: "https://open-seo.example.workers.dev",
+      BETTER_AUTH_SECRET: "x".repeat(40),
+      OPENSEO_OPERATOR_SECRET: "y".repeat(32),
+      OPENSEO_OPERATOR_BOOTSTRAP: "1",
+      DATAFORSEO_API_KEY: btoa("user@example.com:secret"),
+    });
+
+    expect(result.failed).toBe(false);
+    expect(itemFor(result, "AUTH_MODE")?.message).toContain(
+      "the operator creates the administrator",
+    );
+  });
+
   it("warns that GSC stays disabled on a short BETTER_AUTH_SECRET", () => {
     const result = runSelfhostPreflight({
       AUTH_MODE: "local_noauth",

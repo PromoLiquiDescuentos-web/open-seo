@@ -131,6 +131,10 @@ declare namespace Cloudflare {
     OPENROUTER_BASE_URL?: string;
     // Optional OpenRouter model slug override (defaults in openrouter.ts).
     OPENROUTER_MODEL?: string;
+
+    // When set, the public sign-up page cannot claim the first account.
+    // The operator command creates it. See docs/SELF_HOSTING_CLOUDFLARE.md.
+    OPENSEO_OPERATOR_BOOTSTRAP?: string;
   }
 }
 

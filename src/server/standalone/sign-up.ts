@@ -1,7 +1,10 @@
 import { APIError } from "better-auth/api";
 import { z } from "zod";
 import { AuthRepository } from "@/server/auth/repositories/AuthRepository";
-import { isOperatorRequest } from "@/server/standalone/operator-auth";
+import {
+  isOperatorBootstrapRequired,
+  isOperatorRequest,
+} from "@/server/standalone/operator-auth";
 
 const signUpBodySchema = z.object({ email: z.string() });
 
@@ -10,7 +13,10 @@ const signUpBodySchema = z.object({ email: z.string() });
 // which becomes the administrator, and an address that holds a pending
 // invitation, which joins the inviter's organization. Everything else comes
 // from the operator command (src/server/standalone/admin.ts).
+// OPENSEO_OPERATOR_BOOTSTRAP closes the first of those: the public URL must
+// not be claimable while the operator creates the administrator.
 export async function isFirstAccountOpen(): Promise<boolean> {
+  if (isOperatorBootstrapRequired()) return false;
   return !(await AuthRepository.hasAnyUser());
 }
 
