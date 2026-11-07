@@ -63,6 +63,28 @@ if (!AUTH_MODES.includes(authMode)) {
 // needs ACCESS_ALLOWED_EMAILS or the access:write login scope.
 const managedAccess =
   authMode === "cloudflare_access" && !(env.TEAM_DOMAIN && env.POLICY_AUD);
+// Same off-list as isTelemetryOptOutValue in src/shared/selfhost-checks.ts.
+const enabled = (value) => {
+  const normalized = (value || "").trim().toLowerCase();
+  return normalized !== "" && !["0", "false", "no", "off"].includes(normalized);
+};
+if (enabled(env.OPENSEO_OPERATOR_BOOTSTRAP)) {
+  if (authMode !== "password") {
+    fail(
+      `${em("OPENSEO_OPERATOR_BOOTSTRAP")} requires ${em("AUTH_MODE=password")}.`,
+      "That is the mode whose operator command can create the first account.",
+    );
+  }
+  if (!env.OPENSEO_OPERATOR_SECRET || env.OPENSEO_OPERATOR_SECRET.length < 32) {
+    fail(
+      `${em("OPENSEO_OPERATOR_BOOTSTRAP")} closes public sign-up of the first account,`,
+      `so ${em("OPENSEO_OPERATOR_SECRET")} must be set to at least 32 characters`,
+      `(for example ${cmd("openssl rand -hex 32")}). The operator then creates the`,
+      `administrator with ${cmd("pnpm selfhost:admin create-user")}.`,
+    );
+  }
+}
+
 if (managedAccess && !env.ACCESS_ALLOWED_EMAILS) {
   fail(
     `${em("ACCESS_ALLOWED_EMAILS")} is not set in ${envFile} — list who may sign in through`,

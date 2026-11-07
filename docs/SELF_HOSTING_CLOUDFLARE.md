@@ -61,8 +61,10 @@ This provisions the D1 database, KV namespaces, and R2 bucket, applies the datab
 
 ## 5) Create your account
 
+On a public URL, set `OPENSEO_OPERATOR_BOOTSTRAP=1` and `OPENSEO_OPERATOR_SECRET` in `.env.selfhost` before the first deploy. The sign-up page then stays closed, including in the time before an account exists. Create the administrator from the terminal with `pnpm selfhost:admin create-user` (see [Operations](./SELF_HOSTING_CLOUDFLARE_OPERATIONS.md#manage-accounts)) before you share the URL. Invitations work after that account exists. Leave the setting unset only when you can claim the installation yourself the moment deploy finishes.
+
 1. Open the Worker URL printed at the end of the deploy.
-2. Create the administrator's account. Do this right after the deploy finishes: registration closes once the first account exists, and until then anyone who finds the URL could claim the installation.
+2. Create the administrator's account, from the terminal when operator bootstrap is set, or in the browser otherwise. Registration closes once the first account exists. Until then, with operator bootstrap unset, anyone who finds the URL could claim the installation.
 3. OpenSEO loads with a default project. Add your website to get started.
 
 If something fails, see Troubleshooting below.

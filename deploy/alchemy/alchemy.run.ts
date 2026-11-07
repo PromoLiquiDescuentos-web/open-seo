@@ -342,6 +342,10 @@ const dataEnv = {
   // must come from the env file / GitHub environment — a dashboard-set one
   // would be wiped.
   OPENSEO_TELEMETRY_DISABLED: optionalVar("OPENSEO_TELEMETRY_DISABLED"),
+  // Closes public first-account signup. The operator command still creates
+  // that account when OPENSEO_OPERATOR_SECRET is set. Unset keeps the
+  // first-visitor flow.
+  OPENSEO_OPERATOR_BOOTSTRAP: optionalVar("OPENSEO_OPERATOR_BOOTSTRAP"),
 };
 
 export default Alchemy.Stack(
